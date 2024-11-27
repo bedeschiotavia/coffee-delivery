@@ -1,15 +1,23 @@
-import { Bank, CreditCard, CurrencyDollar, MapPin, Money } from "@phosphor-icons/react"
+import { Bank, CreditCard, CurrencyDollar, MapPin, Money, Trash } from "@phosphor-icons/react"
 import {
   AddressContainer,
   AddressForm,
   AddressHeading,
+  CartTotal,
+  CartTotalInfo,
+  CheckoutButton,
+  Coffee,
+  CoffeeInfo,
   Container,
   InfoContainer,
   PaymentContainer,
+  PaymentErrorMessage,
   PaymentHeading,
   PaymentOptions,
 } from "./style"
 
+import { Fragment } from "react"
+import { QuantityInput } from "../../components/Form/QuantityInput"
 import { Radio } from "../../components/Form/Radio"
 import { TextInput } from "../../components/Form/TextInput"
 
@@ -49,11 +57,6 @@ export function Cart() {
                 placeholder="Complement"
                 optional
                 containerProps={{ style: { gridArea: 'fullAddress' } }}
-              />
-
-              <TextInput
-                placeholder="Neighbourhood"
-                containerProps={{ style: { gridArea: 'neighborhood' } }}
               />
 
               <TextInput
@@ -106,12 +109,93 @@ export function Cart() {
                   <span>Cash</span>
                 </Radio>
               </div>
+              <PaymentErrorMessage>
+
+              </PaymentErrorMessage>
             </PaymentOptions>
           </PaymentContainer>
         </form>
       </InfoContainer>
 
-      
+      <InfoContainer>
+        <h2>Selected coffees</h2>
+
+        <CartTotal>
+          <Fragment>
+            <Coffee>
+              <div>
+                <img src="images/coffees/americano.png" alt=""/>
+
+                <div>
+                  <span>Americano</span>
+
+                  <CoffeeInfo>
+                    <QuantityInput/>
+
+                    <button>
+                      <Trash />
+                      <span>Remove</span>
+                    </button>
+                  </CoffeeInfo>
+                </div>
+              </div>
+
+              <aside>€ 3.5</aside>
+            </Coffee>
+            <span />
+          </Fragment>
+          <Fragment>
+            <Coffee>
+              <div>
+                <img src="images/coffees/americano.png" alt=""/>
+
+                <div>
+                  <span>Americano</span>
+
+                  <CoffeeInfo>
+                    <QuantityInput/>
+
+                    <button>
+                      <Trash />
+                      <span>Remove</span>
+                    </button>
+                  </CoffeeInfo>
+                </div>
+              </div>
+
+              <aside>€ 3.5</aside>
+            </Coffee>
+            <span />
+          </Fragment>
+          
+          <CartTotalInfo>
+            <div>
+              <span>Total items</span>
+              <span>
+                € 7
+              </span>
+            </div>
+
+            <div>
+              <span>Delivery fee</span>
+              <span>
+                € 1,56
+              </span>
+            </div>
+
+            <div>
+              <span>Total</span>
+              <span>
+                € 8,58
+              </span>
+            </div>
+          </CartTotalInfo>
+
+          <CheckoutButton type="submit" form="order">
+            Confirm your order
+          </CheckoutButton>
+        </CartTotal>
+      </InfoContainer>
     </Container>
   )
 }
