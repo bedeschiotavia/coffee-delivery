@@ -1,5 +1,5 @@
 import { Minus, Plus } from '@phosphor-icons/react'
-import { Container } from './style'
+import { Container } from './styles'
 
 
 export function QuantityInput() {

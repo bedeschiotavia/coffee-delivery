@@ -10,7 +10,7 @@ import {
   Tags,
   Title,
   Wrapper,
-} from './style'
+} from './styles'
 
 export function Card() {
   const theme = useTheme()

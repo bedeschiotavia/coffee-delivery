@@ -1,7 +1,7 @@
 import { Coffee, Package, ShoppingCart, Timer } from "@phosphor-icons/react"
 import { useTheme } from "styled-components"
 import { Card } from "../../components/Card"
-import { CoffeeList, Heading, Hero, HeroContent, Info } from "./style"
+import { CoffeeList, Heading, Hero, HeroContent, Info } from "./styles"
 
 export function Home (){
   const theme = useTheme()

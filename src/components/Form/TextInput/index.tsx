@@ -8,7 +8,7 @@ import {
 } from 'react'
 
 import { FieldError } from 'react-hook-form'
-import { Box, Container, ErrorMessage } from './style'
+import { Box, Container, ErrorMessage } from './styles'
 
 type Props = InputHTMLAttributes<HTMLInputElement> & {
   optional?: boolean

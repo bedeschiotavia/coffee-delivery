@@ -14,7 +14,7 @@ import {
   PaymentErrorMessage,
   PaymentHeading,
   PaymentOptions,
-} from "./style"
+} from "./styles"
 
 import { Fragment } from "react"
 import { QuantityInput } from "../../components/Form/QuantityInput"
