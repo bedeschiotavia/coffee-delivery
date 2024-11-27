@@ -1,7 +1,7 @@
 import { Coffee, Package, ShoppingCart, Timer } from "@phosphor-icons/react"
 import { useTheme } from "styled-components"
 import { Card } from "../../components/Card"
-import { CoffeeList, Heading, Hero, HeroContent, Info } from "./styles"
+import { CoffeeList, Heading, Hero, HeroContent, Info } from './styles'
 
 export function Home (){
   const theme = useTheme()
@@ -55,9 +55,9 @@ export function Home (){
                 </div>
             </Info>
           </div>
-          <img src="../../../public/images/hero.svg" alt="Coffee Delivery Coffee" />
+          <img src="images/hero.svg" alt="Coffee Delivery Coffee" />
         </HeroContent>
-        <img src="../../../public/images/hero-bg.svg" id="hero-bg" alt="" />
+        <img src="images/hero-bg.svg" id="hero-bg" alt="" />
       </Hero>
 
       <CoffeeList>

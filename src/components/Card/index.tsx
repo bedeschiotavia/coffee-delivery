@@ -17,7 +17,7 @@ export function Card() {
 
   return (
     <Container>
-      <CoffeeImg src='../../../public/images/coffees/americano.png' alt='americano'/>
+      <CoffeeImg src='images/coffees/americano.png' alt='americano'/>
         <Tags>
           <span>regular</span>
           <span>with milk</span>

@@ -1,5 +1,5 @@
 import { MapPin, ShoppingCart } from "@phosphor-icons/react"
-import { Aside, Container } from "./style"
+import { Aside, Container } from "./styles"
 
 export function Header() {
   return (
