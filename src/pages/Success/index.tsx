@@ -1,9 +1,24 @@
-import { CurrencyDollar, MapPin, Timer } from "@phosphor-icons/react"
-import { useTheme } from "styled-components"
-import { Container, Heading, Info, InfoContent, Order } from "./styles"
+import { CurrencyDollar, MapPin, Timer } from '@phosphor-icons/react'
+import { useParams } from 'react-router-dom'
+import { useTheme } from 'styled-components'
+
+import { useCart } from '../../hooks/useCart'
+import { Container, Heading, Info, InfoContent, Order } from './styles'
 
 export function Success() {
+  const { orders } = useCart()
+  const { orderId } = useParams()
+  const orderInfo = orders.find((order) => order.id === Number(orderId))
+  const paymentMethod = {
+    credit: 'Credit card',
+    debit: 'Debit card',
+    cash: 'Cash',
+  }
   const theme = useTheme()
+
+  if (!orderInfo?.id) {
+    return null
+  }
   
   return(
     <Container>
@@ -26,12 +41,12 @@ export function Success() {
                 <span>
                   Delivery on{' '}
                   <strong>
-                    Street
+                  {orderInfo.street}, {orderInfo.number}
                   </strong>
                 </span>
 
                 <span>
-                  Coimbra
+                  {orderInfo.city},{orderInfo.state}
                 </span>
               </div>
             </div>
@@ -58,7 +73,8 @@ export function Success() {
               />
 
               <div>
-                <span>Pagamento na entrega</span>
+                <span>Payment on delivery</span>
+                <strong>{paymentMethod[orderInfo.paymentMethod]}</strong>
 
                 <strong></strong>
               </div>

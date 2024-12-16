@@ -1,5 +1,7 @@
-import { ShoppingCart } from '@phosphor-icons/react'
+import { CheckFat, ShoppingCart } from '@phosphor-icons/react'
+import { useEffect, useState } from 'react'
 import { useTheme } from 'styled-components'
+import { useCart } from '../../hooks/useCart'
 import { QuantityInput } from '../Form/QuantityInput'
 import {
   CoffeeImg,
@@ -12,29 +14,89 @@ import {
   Wrapper,
 } from './styles'
 
-export function Card() {
+type Props = {
+  coffee: {
+    id: string
+    title: string
+    description: string
+    tags: string[]
+    price: number
+    image: string
+  }
+}
+
+export function Card({ coffee }: Props) {
+  const [quantity, setQuantity] = useState(1)
+  const [isItemAdded, setIsItemAdded] = useState(false)
+  const { addItem } = useCart()
+
   const theme = useTheme()
+
+  function incrementQuantity(){
+    setQuantity((state) => state + 1)
+  }
+
+  function decrementQuantity(){
+    if (quantity > 1) {
+      setQuantity((state) => state - 1)
+    }
+  }
+
+  function handleAddItem() {
+    addItem({ id: coffee.id, quantity })
+    setIsItemAdded(true)
+    setQuantity(1)
+  }
+
+  useEffect(() => {
+    let timeout: number
+
+    if (isItemAdded) {
+      timeout = setTimeout(() => {
+        setIsItemAdded(false)
+      }, 1000)
+    }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout)
+      }
+    }
+  }, [isItemAdded])
 
   return (
     <Container>
-      <CoffeeImg src='images/coffees/americano.png' alt='americano'/>
+      <CoffeeImg src={coffee.image} alt={coffee.title}/>
         <Tags>
-          <span>regular</span>
-          <span>with milk</span>
+          {coffee.tags.map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
         </Tags>
-        <Title>Americano</Title>
-        <Description>Diluted espresso, less intense than traditional espresso</Description>
+        <Title>{coffee.title}</Title>
+        <Description>{coffee.description}</Description>
         <Wrapper>
           <Price>
             <span>€</span>
-            <span>3,00</span>
+            <span>{coffee.price}</span>
           </Price>
 
-          <Order>
-            <QuantityInput/>
-            <button>
+          <Order $itemAdded={isItemAdded}>
+            <QuantityInput
+              quantity={quantity}
+              incrementQuantity={incrementQuantity}
+              decrementQuantity={decrementQuantity}
+            />
+            <button disabled={isItemAdded} onClick={handleAddItem}>
+            {isItemAdded ? (
+              <CheckFat
+                weight="fill"
+                size={22}
+                color={theme.colors['base-card']}
+              />
+            ) : (
               <ShoppingCart size={22} color={theme.colors['base-card']} />
-            </button>
+            )}
+          </button>
           </Order>
         </Wrapper>
     </Container>

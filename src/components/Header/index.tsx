@@ -1,19 +1,28 @@
-import { MapPin, ShoppingCart } from "@phosphor-icons/react"
-import { Aside, Container } from "./styles"
+import { MapPin, ShoppingCart } from '@phosphor-icons/react'
+import { Link } from 'react-router-dom'
+
+import { useCart } from '../../hooks/useCart'
+import { Aside, Container } from './styles'
 
 export function Header() {
+  const { cart } = useCart()
+
   return (
     <Container>
-      <img src="../../../public/logo.svg" alt="Coffee Delivery"/>
+      <Link to="/">
+        <img src="/logo.svg" alt="Coffee Delivery" />
+      </Link>
+
       <Aside>
         <div>
-          <MapPin size={22} weight="fill"/>
+          <MapPin size={22} weight="fill" />
           <span>Coimbra, PT</span>
         </div>
-        <a href="">
-          <ShoppingCart size={22} weight="fill"/>
-          <span>3</span>
-        </a>
+
+        <Link to={`cart`} aria-disabled={cart.length === 0}>
+          <ShoppingCart size={22} weight="fill" />
+          {cart.length > 0 ? <span>{cart.length}</span> : null}
+        </Link>
       </Aside>
     </Container>
   )

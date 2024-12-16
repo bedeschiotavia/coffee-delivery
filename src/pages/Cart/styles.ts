@@ -68,7 +68,7 @@ export const AddressForm = styled.div`
     'cep . .'
     'street street street'
     'number fullAddress fullAddress'
-    'neighborhood city state';
+    'city city state';
   grid-template-columns: 200px 1fr 60px;
   grid-gap: 16px 12px;
 `

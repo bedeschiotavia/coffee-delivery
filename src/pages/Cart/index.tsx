@@ -21,12 +21,103 @@ import { QuantityInput } from "../../components/Form/QuantityInput"
 import { Radio } from "../../components/Form/Radio"
 import { TextInput } from "../../components/Form/TextInput"
 
+import { coffees } from '../../../data.json'
+import { useCart } from '../../hooks/useCart'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+type FormInputs = {
+  cep: number
+  street: string
+  number: string
+  fullAddress: string
+  neighborhood: string
+  city: string
+  state: string
+  paymentMethod: 'credit' | 'debit' | 'cash'
+}
+
+const newOrder = z.object({
+  cep: z.number({ invalid_type_error: 'Please enter Postcode' }),
+  street: z.string().min(1, 'Please enter the street'),
+  number: z.string().min(1, 'Please enter the number'),
+  fullAddress: z.string(),
+  city: z.string().min(1, 'Please enter the city'),
+  state: z.string().min(1, 'Please enter the state'),
+  paymentMethod: z.enum(['credit', 'debit', 'cash'], {
+    invalid_type_error: 'Please enter a payment method',
+  }),
+})
+
+export type OrderInfo = z.infer<typeof newOrder>
+
+const shippingPrice = 3.5
+
 export function Cart() {
+  
+  const {
+    cart,
+    checkout,
+    incrementItemQuantity,
+    decrementItemQuantity,
+    removeItem,
+  } = useCart()
+
+  const coffeesInCart = cart.map((item) => {
+    const coffeeInfo = coffees.find((coffee) => coffee.id === item.id)
+
+    if (!coffeeInfo) {
+      throw new Error('Invalid coffee.')
+    }
+
+    return {
+      ...coffeeInfo,
+      quantity: item.quantity,
+    }
+  })
+
+  const totalItemsPrice = coffeesInCart.reduce((previousValue, currentItem) => {
+    return (previousValue += currentItem.price * currentItem.quantity)
+  }, 0)
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormInputs>({
+    resolver: zodResolver(newOrder),
+  })
+
+  const selectedPaymentMethod = watch('paymentMethod')
+
+  function handleItemIncrement(itemId: string) {
+    incrementItemQuantity(itemId)
+  }
+
+  function handleItemDecrement(itemId: string) {
+    decrementItemQuantity(itemId)
+  }
+
+  function handleItemRemove(itemId: string) {
+    removeItem(itemId)
+  }
+
+  const handleOrderCheckout: SubmitHandler<FormInputs> = (data) => {
+    if (cart.length === 0) {
+      return alert('É preciso ter pelo menos um item no carrinho')
+    }
+
+    checkout(data)
+  }
+
   return(
     <Container>
       <InfoContainer>
         <h2>Complete your order</h2>
-        <form>
+        <form id="order" onSubmit={handleSubmit(handleOrderCheckout)}>
           <AddressContainer>
             <AddressHeading>
               <MapPin size={22}/>
@@ -38,36 +129,48 @@ export function Cart() {
 
             <AddressForm>
             <TextInput
-                placeholder="Postal Code"
+                placeholder="Postcode"
                 type="number"
                 containerProps={{ style: { gridArea: 'cep' } }}
+                error={errors.cep}
+                {...register('cep', { valueAsNumber: true })}
               />
 
               <TextInput
                 placeholder="Street"
                 containerProps={{ style: { gridArea: 'street' } }}
+                error={errors.street}
+                {...register('street')}
               />
 
               <TextInput
                 placeholder="Number"
                 containerProps={{ style: { gridArea: 'number' } }}
+                error={errors.number}
+                {...register('number')}
               />
 
               <TextInput
                 placeholder="Complement"
                 optional
                 containerProps={{ style: { gridArea: 'fullAddress' } }}
+                error={errors.fullAddress}
+                {...register('fullAddress')}
               />
 
               <TextInput
                 placeholder="City"
                 containerProps={{ style: { gridArea: 'city' } }}
+                error={errors.city}
+                {...register('city')}
               />
 
               <TextInput
-                placeholder="State"
+                placeholder="St."
                 maxLength={2}
                 containerProps={{ style: { gridArea: 'state' } }}
+                error={errors.state}
+                {...register('state')}
               />
             </AddressForm>
           </AddressContainer>
@@ -86,32 +189,39 @@ export function Cart() {
             </PaymentHeading>
 
             <PaymentOptions>
-              <div>
+            <div>
                 <Radio
-                  value="credit" isSelected={true}                >
+                  isSelected={selectedPaymentMethod === 'credit'}
+                  {...register('paymentMethod')}
+                  value="credit"
+                >
                   <CreditCard size={16} />
                   <span>Credit Card</span>
                 </Radio>
 
                 <Radio
-                  isSelected={false}
+                  isSelected={selectedPaymentMethod === 'debit'}
+                  {...register('paymentMethod')}
                   value="debit"
                 >
                   <Bank size={16} />
-                  <span>Debit Card</span>
+                  <span>Debit Cart</span>
                 </Radio>
 
                 <Radio
-                  isSelected={false}
+                  isSelected={selectedPaymentMethod === 'cash'}
+                  {...register('paymentMethod')}
                   value="cash"
                 >
                   <Money size={16} />
                   <span>Cash</span>
                 </Radio>
               </div>
-              <PaymentErrorMessage>
-
-              </PaymentErrorMessage>
+              {errors.paymentMethod ? (
+                <PaymentErrorMessage role="alert">
+                  {errors.paymentMethod.message}
+                </PaymentErrorMessage>
+              ) : null}
             </PaymentOptions>
           </PaymentContainer>
         </form>
@@ -121,78 +231,71 @@ export function Cart() {
         <h2>Selected coffees</h2>
 
         <CartTotal>
-          <Fragment>
-            <Coffee>
-              <div>
-                <img src="images/coffees/americano.png" alt=""/>
-
+          {coffeesInCart.map((coffee) => (
+            <Fragment key={coffee.id}>
+              <Coffee>
                 <div>
-                  <span>Americano</span>
+                  <img src={coffee.image} alt={coffee.title} />
 
-                  <CoffeeInfo>
-                    <QuantityInput/>
+                  <div>
+                    <span>{coffee.title}</span>
 
-                    <button>
-                      <Trash />
-                      <span>Remove</span>
-                    </button>
-                  </CoffeeInfo>
+                    <CoffeeInfo>
+                      <QuantityInput
+                        quantity={coffee.quantity}
+                        incrementQuantity={() => handleItemIncrement(coffee.id)}
+                        decrementQuantity={() => handleItemDecrement(coffee.id)}
+                      />
+
+                      <button onClick={() => handleItemRemove(coffee.id)}>
+                        <Trash />
+                        <span>Remove</span>
+                      </button>
+                    </CoffeeInfo>
+                  </div>
                 </div>
-              </div>
 
-              <aside>€ 3.5</aside>
-            </Coffee>
-            <span />
-          </Fragment>
-          <Fragment>
-            <Coffee>
-              <div>
-                <img src="images/coffees/americano.png" alt=""/>
+                <aside>€ {coffee.price?.toFixed(2)}</aside>
+              </Coffee>
 
-                <div>
-                  <span>Americano</span>
+              <span />
+            </Fragment>
+          ))}
 
-                  <CoffeeInfo>
-                    <QuantityInput/>
-
-                    <button>
-                      <Trash />
-                      <span>Remove</span>
-                    </button>
-                  </CoffeeInfo>
-                </div>
-              </div>
-
-              <aside>€ 3.5</aside>
-            </Coffee>
-            <span />
-          </Fragment>
-          
           <CartTotalInfo>
             <div>
-              <span>Total items</span>
+              <span>Total de itens</span>
               <span>
-                € 7
+                {new Intl.NumberFormat('pt', {
+                  currency: 'EUR',
+                  style: 'currency',
+                }).format(totalItemsPrice)}
               </span>
             </div>
 
             <div>
-              <span>Delivery fee</span>
+              <span>Entrega</span>
               <span>
-                € 1,56
+                {new Intl.NumberFormat('pt', {
+                  currency: 'EUR',
+                  style: 'currency',
+                }).format(shippingPrice)}
               </span>
             </div>
 
             <div>
               <span>Total</span>
               <span>
-                € 8,58
+                {new Intl.NumberFormat('pt', {
+                  currency: 'EUR',
+                  style: 'currency',
+                }).format(totalItemsPrice + shippingPrice)}
               </span>
             </div>
           </CartTotalInfo>
 
           <CheckoutButton type="submit" form="order">
-            Confirm your order
+            Order confirmation
           </CheckoutButton>
         </CartTotal>
       </InfoContainer>

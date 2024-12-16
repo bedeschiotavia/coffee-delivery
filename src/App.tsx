@@ -1,22 +1,20 @@
-import { ThemeProvider } from "styled-components"
+import { Outlet } from 'react-router-dom'
+import { ThemeProvider } from 'styled-components'
 
-import { Header } from "./components/Header"
-
-import { Success } from "./pages/Success"
+import { Header } from './components/Header'
+import { CartContextProvider } from './contexts/CartProvider'
 import { GlobalStyle } from './styles/global'
 import { defaultTheme } from './styles/themes/default'
 
-function App() {
-
+export function App() {
   return (
-    <>
-      <ThemeProvider theme={defaultTheme}>
-        <GlobalStyle/>
-        <Header/>
-        <Success/>
-      </ThemeProvider>
-    </>
+    <ThemeProvider theme={defaultTheme}>
+      <GlobalStyle />
+
+      <CartContextProvider>
+        <Header />
+        <Outlet />
+      </CartContextProvider>
+    </ThemeProvider>
   )
 }
-
-export default App
